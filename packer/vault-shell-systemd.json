@@ -1,0 +1,67 @@
+{
+	"variables": {
+		"aws_access_key_id": "{{ env `AWS_ACCESS_KEY_ID` }}",
+		"aws_secret_access_key": "{{ env `AWS_SECRET_ACCESS_KEY` }}",
+		"region": "{{ env `AWS_REGION` }}",
+		"vpc_id": "{{ env `PACKER_VPC_ID` }}",
+		"subnet_id": "{{ env `PACKER_SUBNET_ID` }}",
+		"environment": "{{ env `PACKER_ENVIRONMENT` }}"
+	},
+	"builders": [{
+		"type": "amazon-ebs",
+		"access_key": "{{ user `aws_access_key_id` }}",
+		"secret_key": "{{ user `aws_secret_access_key` }}",
+		"region": "{{user `region`}}",
+		"spot_price_auto_product": "Linux/UNIX (Amazon VPC)",
+
+		"ssh_pty": true,
+		"instance_type": "t2.medium",
+		"vpc_id": "{{user `vpc_id` }}",
+		"subnet_id": "{{user `subnet_id` }}",
+		"associate_public_ip_address": true,
+
+		"source_ami_filter": "RHEL-7.3_HVM_GA-20161026-x86_64-1-Hourly2-GP2",
+
+		"ssh_username": "hashicorp",
+		"ssh_timeout": "5m",
+
+		"ami_virtualization_type": "hvm",
+		"ami_description": "Vault Server",
+		"ami_name": "se-vault-server-RHEL7.3-{{isotime \"2006-01-02-1504\"}}",
+		"tags": {
+			"Name": "{{user `environment`}} Vault Server",
+			"System": "Vault Enterprise",
+			"Component": "Vault",
+			"OS": "RHEL-7.3"
+		}
+	}],
+	"provisioners": [
+		{
+			"type": "shell",
+			"start_retry_timeout": "10m",
+			"inline": [
+				"sudo mkdir -p /secrets",
+				"echo 'tmpfs   /secrets         tmpfs   nodev,nosuid,noexec,size=8M      0  0' | sudo tee -a /etc/fstab",
+				"sudo mount -a"
+			]
+		},
+		{
+			"type": "shell",
+			"start_retry_timeout": "10m",
+			"inline": [
+				"/usr/bin/sudo /sbin/setenforce 0",
+               			"/bin/curl https://raw.githubusercontent.com/ncorrare/terraform-examples/master/provision.sh | /usr/bin/sudo /bin/bash",
+               			"/usr/bin/sudo /opt/puppetlabs/bin/puppet apply --environment packer -e 'include profile::vault'"
+			]
+		},
+		{
+			"type": "shell",
+			"start_retry_timeout": "5m",
+			"inline": [
+				"sudo rm -rf /var/lib/cloud/instances/*",
+				"sudo rm -f /root/.ssh/authorized_keys",
+				"sudo rm -f /home/hashicorp/.ssh/authorized_keys"
+			]
+		}
+	]
+}
