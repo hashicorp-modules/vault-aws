@@ -52,6 +52,7 @@
 		"start_retry_timeout": "10m",
 		"inline": [
 			"/usr/bin/sudo /sbin/setenforce 0",
+			"/usr/bin/sudo yum -y install redhat-lsb-core",
 			"/bin/curl https://raw.githubusercontent.com/ncorrare/terraform-examples/master/provision.sh | /usr/bin/sudo /bin/bash",
 			"/usr/bin/sudo /opt/puppetlabs/bin/puppet apply --environment packer -e 'include profile::vault'"
 		]
