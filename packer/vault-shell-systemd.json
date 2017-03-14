@@ -60,9 +60,12 @@
 		"type": "shell",
 		"start_retry_timeout": "5m",
 		"inline": [
+                        "sudo yum -y remove puppet-agent puppetlabs-release-pc1",
+			"sudo rm -rf /etc/puppetlabs",
 			"sudo rm -rf /var/lib/cloud/instances/*",
 			"sudo rm -f /root/.ssh/authorized_keys",
-			"sudo rm -f /home/hashicorp/.ssh/authorized_keys"
+			"sudo rm -f /home/ec2-user/.ssh/authorized_keys",
+			"history -cw"
 		]
 	}
 	]
