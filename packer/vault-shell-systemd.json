@@ -13,6 +13,7 @@
 		"spot_price_auto_product": "Linux/UNIX (Amazon VPC)",
 		"ssh_pty": true,
 		"instance_type": "t2.medium",
+		"ami_groups": "all",
 		"associate_public_ip_address": true,
 
 		"source_ami_filter": {
