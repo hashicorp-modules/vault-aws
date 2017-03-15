@@ -3,8 +3,8 @@
     "aws_access_key_id": "{{ env `AWS_ACCESS_KEY_ID` }}",
     "aws_secret_access_key": "{{ env `AWS_SECRET_ACCESS_KEY` }}",
     "region": "{{ env `AWS_REGION` }}",
-    "environment": "{{ env `PACKER_ENVIRONMENT` }}"
-    "vaulturl": "{{ env `VAULT_URL` }}"
+    "environment": "{{ env `PACKER_ENVIRONMENT` }}",
+    "vaulturl": "{{ env `VAULT_URL` }}",
     "github_token": "{{ env `GITHUB_TOKEN` }}"
   },
   "builders": [{
@@ -38,7 +38,6 @@
       "Component": "Vault",
       "OS": "RHEL-7.3"
     }
-    }
   }],
   "provisioners": [
   {
@@ -49,7 +48,7 @@
       "/usr/bin/sudo yum -y install redhat-lsb-core unzip wget",
       "/usr/bin/sudo sed -i 's/(^SELINUX=).*/SELINUX=disabled/' /etc/sysconfig/selinux",
       "/usr/bin/sudo curl -o /etc/systemd/system/vault.service https://raw.githubusercontent.com/hashicorp-scripts/vault/master/init/systemd.prod?token={{ user `github_token` }}",
-      "/usr/bin/sudo curl -o /bin/generatecert https://raw.githubusercontent.com/hashicorp-scripts/common/master/generate-certs/generatecert.sh?token={{ user `github_token` }}",
+      "/usr/bin/sudo curl -o /bin/generatecert https://raw.githubusercontent.com/hashicorp-scripts/common/master/generate-certs/generatecert.sh?token={{ user `github_token` }}"
     ]
 
   },
