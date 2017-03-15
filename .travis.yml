@@ -1,0 +1,10 @@
+language: generic
+branches:
+  only:
+  - master
+install:
+  - curl -o /tmp/packer.zip https://releases.hashicorp.com/packer/0.12.3/packer_0.12.3_linux_amd64.zip
+  - unzip /tmp/packer.zip
+  - chmod +x /tmp/packer
+script:
+  - find packer -iname '*.json' -print0  | xargs -0 -I {} /tmp/packer validate {}
