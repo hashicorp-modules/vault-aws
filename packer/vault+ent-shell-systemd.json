@@ -4,6 +4,8 @@
 		"aws_secret_access_key": "{{ env `AWS_SECRET_ACCESS_KEY` }}",
 		"region": "{{ env `AWS_REGION` }}",
 		"environment": "{{ env `PACKER_ENVIRONMENT` }}"
+		"vaulturl": "{{ env `VAULT_URL` }}"
+		"github_token": "{{ env `GITHUB_TOKEN` }}"
 	},
 	"builders": [{
 		"type": "amazon-ebs",
@@ -13,8 +15,8 @@
 		"spot_price_auto_product": "Linux/UNIX (Amazon VPC)",
 		"ssh_pty": true,
 		"instance_type": "t2.medium",
+		"ami_groups": "all",
 		"associate_public_ip_address": true,
-
 		"source_ami_filter": {
 			"filters": {
 				"virtualization-type": "hvm",
@@ -28,13 +30,14 @@
 		"ssh_timeout": "5m",
 
 		"ami_virtualization_type": "hvm",
-		"ami_description": "Vault Server",
-		"ami_name": "se-vault-0.6.5-RHEL7.3-{{isotime \"2006-01-02-1504\"}}",
+		"ami_description": "Vault Enterprise Server",
+		"ami_name": "se-vault-0.6.5+ent-RHEL7.3-{{isotime \"2006-01-02-1504\"}}",
 		"tags": {
 			"Name": "{{user `environment`}} Vault Server",
-			"System": "Vault OSS",
+			"System": "Vault Enterprise",
 			"Component": "Vault",
 			"OS": "RHEL-7.3"
+		}
 		}
 	}],
 	"provisioners": [
@@ -42,34 +45,37 @@
 		"type": "shell",
 		"start_retry_timeout": "10m",
 		"inline": [
-			"sudo mkdir -p /secrets",
-			"echo 'tmpfs   /secrets         tmpfs   nodev,nosuid,noexec,size=8M      0  0' | sudo tee -a /etc/fstab",
-			"sudo mount -a"
+			"/usr/bin/sudo /sbin/setenforce 0",
+			"/usr/bin/sudo yum -y install redhat-lsb-core unzip wget",
+			"/usr/bin/sudo sed -i 's/(^SELINUX=).*/SELINUX=disabled/' /etc/sysconfig/selinux",
+			"/usr/bin/sudo curl -o /etc/systemd/system/vault.service https://raw.githubusercontent.com/hashicorp-scripts/vault/master/init/systemd.prod?token={{ user `github_token` }}",
+			"/usr/bin/sudo curl -o /bin/generatecert https://raw.githubusercontent.com/hashicorp-scripts/common/master/generate-certs/generatecert.sh?token={{ user `github_token` }}",
 		]
-	},
-	{
-		"type": "file",
-		"source": "files/vault.zip",
-		"destination": "/tmp/vault.zip"
+
 	},
 	{
 		"type": "shell",
 		"start_retry_timeout": "10m",
 		"inline": [
-			"/usr/bin/sudo /sbin/setenforce 0",
-			"/usr/bin/sudo yum -y install redhat-lsb-core",
-			"/bin/curl https://raw.githubusercontent.com/ncorrare/terraform-examples/master/provision.sh | /usr/bin/sudo /bin/bash",
-			"/usr/bin/sudo /opt/puppetlabs/bin/puppet apply --environment packerent -e 'include profile::vault'"
+			"/bin/curl -o /tmp/vault_dl_install.sh https://raw.githubusercontent.com/hashicorp-scripts/vault/master/install-generic/vault_dl_install.sh?token={{ user `github_token` }}",
+			"/usr/bin/sudo chmod +x /tmp/vault_dl_install.sh",
+			"/usr/bin/sudo /tmp/vault_dl_install.sh {{ user `vaulturl` }}",
+			"/usr/bin/sudo chmod +x /bin/generatecert",
+			"/usr/bin/sudo /bin/generatecert vault",
+			"/usr/bin/sudo curl -o /etc/vault/config.hcl https://raw.githubusercontent.com/hashicorp-scripts/vault/master/config/config.hcl.inmem?token={{ user `github_token` }}",
+			"/usr/bin/sudo curl -o /etc/vault/ui.hcl https://raw.githubusercontent.com/hashicorp-scripts/vault/master/config/ui.hcl?token={{ user `github_token` }}",
+			"/usr/bin/sudo service vault start"
+
 		]
 	},
 	{
 		"type": "shell",
 		"start_retry_timeout": "5m",
 		"inline": [
-                        "sudo yum -y remove puppet-agent puppetlabs-release-pc1",
-			"sudo rm -rf /etc/puppetlabs",
 			"sudo rm -rf /var/lib/cloud/instances/*",
 			"sudo rm -f /root/.ssh/authorized_keys",
+			"sudo rm -f /bin/generatecert",
+
 			"sudo rm -f /home/ec2-user/.ssh/authorized_keys",
 			"history -cw"
 		]
