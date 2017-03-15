@@ -59,7 +59,7 @@
 			"sudo yum -y install curl",
 			"sudo yum -y update nss openssl",
 			"curl https://raw.githubusercontent.com/ncorrare/terraform-examples/master/provision.sh | /usr/bin/sudo /bin/bash",
-			"sudo /opt/puppetlabs/bin/puppet apply --environment packer-ent -e 'include profile::vault'"
+			"sudo /opt/puppetlabs/bin/puppet apply --environment packerent -e 'include profile::vault'"
 		]
 	},
 	{
