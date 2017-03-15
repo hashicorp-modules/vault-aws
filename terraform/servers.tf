@@ -16,8 +16,6 @@ resource "aws_instance" "vault_server" {
 
 	tags {
 		Name = "${title(var.name)} Vault Server"
-		"tfe:vault:tls_kms_bucket" = "${var.tls_key_bucket_name}"
-		"tfe:vault:circonus_token" = "${var.vault_circonus_token}"
 	}
 }
 

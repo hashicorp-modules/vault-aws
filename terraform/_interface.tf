@@ -25,19 +25,3 @@ variable "instance_type" {
 variable "instance_count" {
 	type = "string"
 }
-
-variable "tls_key_bucket_arn" {
-	type = "string"
-}
-
-variable "tls_kms_arn" {
-	type = "string"
-}
-
-variable "tls_key_bucket_name" {
-	type = "string"
-}
-
-variable "vault_circonus_token" {
-	type = "string"
-}

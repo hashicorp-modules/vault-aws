@@ -13,26 +13,6 @@ data "aws_iam_policy_document" "assume_role" {
 
 data "aws_iam_policy_document" "vault_server" {
 	statement {
-		sid = "AllowVaultKeysAccess"
-		effect = "Allow"
-		resources = [
-			"${var.tls_key_bucket_arn}/vault/*"
-		]
-		actions = [
-			"s3:GetObject"
-		]
-	}
-	statement {
-		sid = "AllowTLSKeyDecrypt"
-		effect = "Allow"
-		resources = [
-			"${var.tls_kms_arn}"
-		]
-		actions = [
-			"kms:Decrypt"
-		]
-	}
-	statement {
 		sid = "AllowDiscovery"
 		effect = "Allow"
 		resources = [
