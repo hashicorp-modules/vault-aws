@@ -37,6 +37,7 @@
       "System": "Vault Enterprise",
       "Component": "Vault",
       "OS": "RHEL-7.3"
+      "Built-By": "CI"
     }
   }],
   "provisioners": [
