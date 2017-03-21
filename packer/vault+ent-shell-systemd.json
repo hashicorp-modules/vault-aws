@@ -36,7 +36,7 @@
       "Name": "{{user `environment`}} Vault Server",
       "System": "Vault Enterprise",
       "Component": "Vault",
-      "OS": "RHEL-7.3"
+      "OS": "RHEL-7.3",
       "Built-By": "CI"
     }
   }],
