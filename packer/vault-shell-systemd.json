@@ -5,7 +5,6 @@
     "region": "{{ env `AWS_REGION` }}",
     "environment": "{{ env `PACKER_ENVIRONMENT` }}",
     "github_token": "{{ env `GITHUB_TOKEN` }}"
-    "vault_version": "{{ env `VAULT` }}"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -32,7 +31,7 @@
 
     "ami_virtualization_type": "hvm",
     "ami_description": "Vault Server",
-    "ami_name": "se-vault-{{user `vault_version`}}-RHEL7.3-{{isotime \"2006-01-02-1504\"}}",
+    "ami_name": "se-vault-0.6.5-RHEL7.3-{{isotime \"2006-01-02-1504\"}}",
     "tags": {
       "Name": "{{user `environment`}} Vault Server",
       "System": "Vault OSS",
