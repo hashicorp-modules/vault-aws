@@ -4,7 +4,8 @@
     "aws_secret_access_key": "{{ env `AWS_SECRET_ACCESS_KEY` }}",
     "region": "{{ env `AWS_REGION` }}",
     "environment": "{{ env `PACKER_ENVIRONMENT` }}",
-    "github_token": "{{ env `GITHUB_TOKEN` }}"
+    "github_token": "{{ env `GITHUB_TOKEN` }}",
+    "vault_version": "{{ env `VAULT_VERSION` }}"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -30,10 +31,10 @@
     "ssh_timeout": "5m",
 
     "ami_virtualization_type": "hvm",
-    "ami_description": "Vault Server",
-    "ami_name": "se-vault-0.6.5-RHEL7.3-{{isotime \"2006-01-02-1504\"}}",
+    "ami_description": "Vault Server {{user `vault_version`}}",
+    "ami_name": "se-vault-{{user `vault_version`}}-RHEL7.3-{{isotime \"2006-01-02-1504\"}}",
     "tags": {
-      "Name": "{{user `environment`}} Vault Server",
+      "Name": "{{user `environment`}} Vault Server {{user `vault_version`}}",
       "System": "Vault OSS",
       "Component": "Vault",
       "OS": "RHEL-7.3"
@@ -47,8 +48,8 @@
       "/usr/bin/sudo /sbin/setenforce 0",
       "/usr/bin/sudo yum -y install redhat-lsb-core unzip wget",
       "/usr/bin/sudo sed -i 's/(^SELINUX=).*/SELINUX=disabled/' /etc/sysconfig/selinux",
-      "/usr/bin/sudo curl -o /etc/systemd/system/vault.service https://raw.githubusercontent.com/hashicorp-scripts/vault/master/init/systemd.prod?token={{user `github_token`}}",
-      "/usr/bin/sudo curl -o /bin/generatecert https://raw.githubusercontent.com/hashicorp-scripts/common/master/generate-certs/generatecert.sh?token={{user `github_token`}}"
+      "/usr/bin/sudo curl -H 'Authorization: token {{user `github_token`}}' -H 'Accept: application/vnd.github.v3.raw' -o /etc/systemd/system/vault.service https://raw.githubusercontent.com/hashicorp-scripts/vault/master/init/systemd.prod",
+      "/usr/bin/sudo curl -H 'Authorization: token {{user `github_token`}}' -H 'Accept: application/vnd.github.v3.raw' -o /tmp/generatecert https://raw.githubusercontent.com/hashicorp-scripts/common/master/generate-certs/generatecert.sh"
     ]
 
   },
@@ -56,10 +57,12 @@
     "type": "shell",
     "start_retry_timeout": "10m",
     "inline": [
-      "/bin/curl https://raw.githubusercontent.com/hashicorp-scripts/vault/master/install-generic/vault_dl_install.sh?token={{user `github_token`}} | /usr/bin/sudo bash",
-      "/usr/bin/sudo chmod +x /bin/generatecert",
-      "/usr/bin/sudo /bin/generatecert vault",
-      "/usr/bin/sudo curl -o /etc/vault/config.hcl https://raw.githubusercontent.com/hashicorp-scripts/vault/master/config/config.hcl.inmem?token={{user `github_token`}}",
+      "curl -H 'Authorization: token {{user `github_token`}}' -H 'Accept: application/vnd.github.v3.raw' -o /tmp/vault_dl_install https://raw.githubusercontent.com/hashicorp-scripts/vault/master/install-generic/vault_dl_install.sh",
+      "/usr/bin/sudo chmod +x /tmp/generatecert",
+      "/usr/bin/sudo chmod +x /tmp/vault_dl_install",
+      "/usr/bin/sudo env VAULT_VERSION=0.7.0 /tmp/vault_dl_install",
+      "/usr/bin/sudo /tmp/generatecert vault",
+      "/usr/bin/sudo curl -H 'Authorization: token {{user `github_token`}}' -H 'Accept: application/vnd.github.v3.raw' -o /etc/vault/config.hcl https://raw.githubusercontent.com/hashicorp-scripts/vault/master/config/config.hcl.inmem",
       "/usr/bin/sudo service vault start"
     ]
   },
@@ -69,8 +72,8 @@
     "inline": [
       "sudo rm -rf /var/lib/cloud/instances/*",
       "sudo rm -f /root/.ssh/authorized_keys",
-      "sudo rm -f /bin/generatecert",
-      "sudo rm -f /tmp/vault.json.erb",
+      "sudo rm -f /tmp/generatecert",
+      "sudo rm -f /tmp/vault_dl_install",
       "sudo rm -f /home/ec2-user/.ssh/authorized_keys",
       "history -cw"
     ]
