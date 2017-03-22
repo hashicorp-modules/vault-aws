@@ -3,76 +3,84 @@
 		"aws_access_key_id": "{{ env `AWS_ACCESS_KEY_ID` }}",
 		"aws_secret_access_key": "{{ env `AWS_SECRET_ACCESS_KEY` }}",
 		"region": "{{ env `AWS_REGION` }}",
-		"environment": "{{ env `PACKER_ENVIRONMENT` }}"
+		"environment": "{{ env `PACKER_ENVIRONMENT` }}",
+		"github_token": "{{ env `GITHUB_TOKEN` }}",
+		"vault_version": "{{ env `VAULT_VERSION` }}"
 	},
-	"builders": [{
-		"type": "amazon-ebs",
-		"access_key": "{{ user `aws_access_key_id` }}",
-		"secret_key": "{{ user `aws_secret_access_key` }}",
-		"region": "{{user `region`}}",
-		"spot_price_auto_product": "Linux/UNIX (Amazon VPC)",
-		"ssh_pty": true,
-                "ami_groups": "all",
-		"instance_type": "t2.medium",
-		"associate_public_ip_address": true,
-		"source_ami_filter": {
-			"filters": {
-				"virtualization-type": "hvm",
-				"name": "*RHEL-6.7_HVM_GA-*",
-				"root-device-type": "ebs"
+		"builders": [{
+			"type": "amazon-ebs",
+			"access_key": "{{ user `aws_access_key_id` }}",
+			"secret_key": "{{ user `aws_secret_access_key` }}",
+			"region": "{{user `region`}}",
+			"spot_price_auto_product": "Linux/UNIX (Amazon VPC)",
+			"ssh_pty": true,
+			"ami_groups": "all",
+			"instance_type": "t2.medium",
+			"associate_public_ip_address": true,
+			"source_ami_filter": {
+				"filters": {
+					"virtualization-type": "hvm",
+					"name": "*RHEL-6.7_HVM_GA-*",
+					"root-device-type": "ebs"
+				},
+				"owners": ["309956199498"],
+				"most_recent": true
 			},
-			"owners": ["309956199498"],
-			"most_recent": true
-		},
-		"ssh_username": "ec2-user",
-		"ssh_timeout": "5m",
+			"ssh_username": "ec2-user",
+			"ssh_timeout": "5m",
 
-		"ami_virtualization_type": "hvm",
-		"ami_description": "Vault Server",
-		"ami_name": "se-vault-0.6.5-RHEL6.7-{{isotime \"2006-01-02-1504\"}}",
-		"tags": {
-			"Name": "{{user `environment`}} Vault Server",
-			"System": "Vault OSS",
-			"Component": "Vault",
-			"OS": "RHEL-6.7"
-		}
-	}],
-	"provisioners": [
-	{
-		"type": "shell",
-		"start_retry_timeout": "10m",
-		"inline": [
-			"/usr/bin/sudo setenforce 0",
+			"ami_virtualization_type": "hvm",
+			"ami_description": "Vault Server {{user `vault_version`}}",
+			"ami_name": "se-vault-{{user `vault_version`}}-RHEL6.7-{{isotime \"2006-01-02-1504\"}}",
+			"tags": {
+				"Name": "{{user `environment`}} Vault Server {{user `vault_version`}}",
+				"System": "Vault OSS",
+				"Component": "Vault",
+				"OS": "RHEL-6.7"
+			}
+		}],
+		"provisioners": [
+		{
+			"type": "shell",
+			"start_retry_timeout": "10m",
+			"inline": [
+			"echo \"Prep Stage\"",
+				"/usr/bin/sudo setenforce 0",
 			"/usr/bin/sudo yum -y install redhat-lsb-core unzip wget curl",
 			"/usr/bin/sudo sed -i 's/(^SELINUX=).*/SELINUX=disabled/' /etc/sysconfig/selinux",
-			"/usr/bin/sudo curl -o /etc/init.d/vault https://raw.githubusercontent.com/hashicorp-scripts/vault/master/init/vault.sysvinit?token=ABJa1OHvCU8KN-keJcTZyake9qtS6k7_ks5Y0uXNwA%3D%3D",
+			"/usr/bin/sudo curl -H 'Authorization: token {{user `github_token`}}' -H 'Accept: application/vnd.github.v3.raw' -o /etc/init.d/vault https://raw.githubusercontent.com/hashicorp-scripts/vault/master/init/vault.sysvinit",
 			"/usr/bin/sudo chmod +x /etc/init.d/vault",
-			"/usr/bin/sudo curl -o /bin/generatecert https://raw.githubusercontent.com/hashicorp-scripts/common/master/generate-certs/generatecert.sh?token=ABJa1J9yjYybN_7PtSrEi-m0isrWhkzKks5Y0r3WwA%3D%3D"
-		]
+			"/usr/bin/sudo curl -H 'Authorization: token {{user `github_token`}}' -H 'Accept: application/vnd.github.v3.raw' -o /tmp/generatecert https://raw.githubusercontent.com/hashicorp-scripts/common/master/generate-certs/generatecert.sh"
+			]
 
-	},
-	{
-		"type": "shell",
-		"start_retry_timeout": "10m",
-		"inline": [
-			"curl https://raw.githubusercontent.com/hashicorp-scripts/vault/master/install-generic/vault_dl_install.sh?token=ABJa1JyYzbE_zux6JOERk2DVDuYpjiSCks5Y0r65wA%3D%3D | /usr/bin/sudo bash",
-			"/usr/bin/sudo chmod +x /bin/generatecert",
-			"/usr/bin/sudo /bin/generatecert vault",
-			"/usr/bin/sudo curl -o /etc/vault/config.hcl https://raw.githubusercontent.com/hashicorp-scripts/vault/master/config/config.hcl.inmem?token=ABJa1JxxFlPojSUKf1-b4tE3NvWdKWDeks5Y0t2RwA%3D%3D",
+		},
+		{
+			"type": "shell",
+			"start_retry_timeout": "10m",
+			"inline": [
+			"echo \"Install stage\"",
+			"curl -H 'Authorization: token {{user `github_token`}}' -H 'Accept: application/vnd.github.v3.raw' -o /tmp/vault_dl_install https://raw.githubusercontent.com/hashicorp-scripts/vault/master/install-generic/vault_dl_install.sh",
+			"/usr/bin/sudo chmod +x /tmp/generatecert",
+			"/usr/bin/sudo chmod +x /tmp/vault_dl_install",
+			"/usr/bin/sudo env VAULT_VERSION=0.7.0 /tmp/vault_dl_install", 
+			"/usr/bin/sudo /tmp/generatecert vault",
+			"/usr/bin/sudo curl -H 'Authorization: token {{user `github_token`}}' -H 'Accept: application/vnd.github.v3.raw' -o /etc/vault/config.hcl https://raw.githubusercontent.com/hashicorp-scripts/vault/master/config/config.hcl.inmem",
 			"/usr/bin/sudo service vault start"
 
-		]
-	},
-	{
-		"type": "shell",
-		"start_retry_timeout": "5m",
-		"inline": [
-			"sudo rm -rf /var/lib/cloud/instances/*",
+			]
+		},
+		{
+			"type": "shell",
+			"start_retry_timeout": "5m",
+			"inline": [
+			"echo \"Cleanup stage\"",
+				"sudo rm -rf /var/lib/cloud/instances/*",
 			"sudo rm -f /root/.ssh/authorized_keys",
-			"sudo rm -f /bin/generatecert",
+			"sudo rm -f /tmp/generatecert",
+			"sudo rm -f /tmp/vault_dl_install",
 			"sudo rm -f /home/ec2-user/.ssh/authorized_keys",
 			"history -cw"
-		]
-	}
+			]
+		}
 	]
 }
