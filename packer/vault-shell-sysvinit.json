@@ -36,12 +36,12 @@
       "tags": {
         "Name": "{{user `environment`}} Vault Server {{user `vault_version`}}",
         "System": "Vault OSS",
-        "Component": "Vault",
-        "Version": "{{user `vault_version`}}",
+        "Product": "Vault",
+        "Product-Version": "{{user `vault_version`}}",
         "Environment": "{{user `environment`}}",
         "Built-By": "{{user `vcsname`}}",
         "OS": "RHEL",
-        "OSVersion": "6.7"
+        "OS-Version": "6.7"
       }
     }],
     "provisioners": [
