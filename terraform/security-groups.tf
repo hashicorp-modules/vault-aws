@@ -1,24 +1,3 @@
-resource "aws_instance" "vault_server" {
-	count = "${var.instance_count}"
-
-	ami = "${var.ami}"
-	instance_type = "${var.instance_type}"
-
-	subnet_id = "${element(var.private_subnet_ids, count.index)}"
-	associate_public_ip_address = false
-	vpc_security_group_ids = [
-		"${aws_security_group.vault_instance.id}",
-		"${var.consul_sg_id}"
-	]
-
-	iam_instance_profile = "${aws_iam_instance_profile.vault_server.name}"
-	monitoring = true
-
-	tags {
-		Name = "${title(var.name)} Vault Server"
-	}
-}
-
 resource "aws_security_group" "vault_instance" {
 	name = "vault-instance"
 	description = "Allow traffic to Vault Servers"
