@@ -1,7 +1,3 @@
-terraform {
-  required_version = ">= 0.9.3"
-}
-
 module "images-aws" {
   source        = "git@github.com:hashicorp-modules/images-aws.git?ref=dan-refactor"
   vault_version = "${var.vault_version}"
