@@ -7,6 +7,10 @@ variable "consul_server_sg_id" {
   description = "Consul Server Security Group ID"
 }
 
+variable "environment_name" {
+  description = "Environment Name (tagged to all instances)"
+}
+
 variable "os" {
   # case sensitive for AMI lookup
   description = "Operating System to use ie RHEL or Ubuntu"
@@ -40,11 +44,6 @@ variable "consul_as_server" {
   description = "Run the consul agent in server mode: true/false"
 }
 
-variable "vault_version" {
-  default     = "0.7.0"
-  description = "Vault version to use ie 0.7.0"
-}
-
 variable "instance_type" {
   default     = "m4.large"
   description = "AWS instance type to use eg m4.large"
@@ -53,6 +52,11 @@ variable "instance_type" {
 variable "region" {
   default     = "us-west-1"
   description = "Region to deploy vault cluster ie us-west-1"
+}
+
+variable "vault_version" {
+  default     = "0.7.2"
+  description = "Vault version to use ie 0.7.2"
 }
 
 # Outputs
