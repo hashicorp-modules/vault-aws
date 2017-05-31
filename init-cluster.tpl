@@ -11,7 +11,9 @@ hostnamectl set-hostname "$${new_hostname}"
 jq ".retry_join_ec2 += {\"tag_key\": \"Environment-Name\", \"tag_value\": \"${environment_name}\"}" < /etc/consul.d/consul-default.json.example > /etc/consul.d/consul-default.json
 chown consul:consul /etc/consul.d/consul-default.json
 
-# configure vault defaults
+# add default vault config to use consul
+cp /etc/vault.d/vault-consul.hcl.example /etc/vault.d/vault-consul.hcl
+chown vault:vault /etc/vault.d/vault-consul.hcl
 
 if [[ "${consul_as_server}" = "true" ]]; then
   # add the cluster instance count to the config with jq
@@ -19,7 +21,15 @@ if [[ "${consul_as_server}" = "true" ]]; then
   chown consul:consul /etc/consul.d/consul-server.json
 fi
 
-# configure vault tls or no-tls
+if [[ "${vault_use_tls}" = "true" ]]; then
+  cp /etc/vault.d/vault-tls.hcl.example /etc/vault.d/vault-tls.hcl
+  chown vault:vault /etc/vault.d/vault-tls.hcl
+  echo "export VAULT_ADDR=https://127.0.0.1:8200" | tee -a /etc/profile.d/vault.sh
+else
+  cp /etc/vault.d/vault-no-tls.hcl.example /etc/vault.d/vault-no-tls.hcl
+  chown vault:vault /etc/vault.d/vault-no-tls.hcl
+  echo "export VAULT_ADDR=http://127.0.0.1:8200" | tee -a /etc/profile.d/vault.sh
+fi
 
 # consul agent exists on all instances in client or server configuration
 systemctl enable consul

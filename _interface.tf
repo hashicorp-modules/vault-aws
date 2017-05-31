@@ -54,6 +54,11 @@ variable "region" {
   description = "Region to deploy vault cluster ie us-west-1"
 }
 
+variable "vault_use_tls" {
+  default     = "true"
+  description = "Use TLS for vault communication: true/false"
+}
+
 variable "vault_version" {
   default     = "0.7.2"
   description = "Vault version to use ie 0.7.2"

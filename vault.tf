@@ -32,6 +32,7 @@ data "template_file" "init" {
     cluster_size     = "${var.cluster_size}"
     consul_as_server = "${var.consul_as_server}"
     environment_name = "${var.environment_name}"
+    vault_use_tls    = "${var.vault_use_tls}"
   }
 }
 
