@@ -3,7 +3,7 @@ terraform {
 }
 
 module "images-aws" {
-  source        = "git@github.com:hashicorp-modules/images-aws.git"
+  source        = "git@github.com:hashicorp-modules/images-aws.git?ref=2017-05-26"
   vault_version = "${var.vault_version}"
   os            = "${var.os}"
   os_version    = "${var.os_version}"
@@ -29,7 +29,10 @@ data "template_file" "init" {
   template = "${file("${path.module}/init-cluster.tpl")}"
 
   vars = {
+    cluster_size     = "${var.cluster_size}"
     consul_as_server = "${var.consul_as_server}"
+    environment_name = "${var.environment_name}"
+    vault_use_tls    = "${var.vault_use_tls}"
   }
 }
 
@@ -72,6 +75,12 @@ resource "aws_autoscaling_group" "vault_server" {
   tag {
     key                 = "Cluster-Name"
     value               = "${var.cluster_name}"
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "Environment-Name"
+    value               = "${var.environment_name}"
     propagate_at_launch = true
   }
 }
