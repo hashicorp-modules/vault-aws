@@ -60,8 +60,8 @@ variable "vault_use_tls" {
 }
 
 variable "vault_version" {
-  default     = "0.7.2"
-  description = "Vault version to use ie 0.7.2"
+  default     = "0.7.3"
+  description = "Vault version to use ie 0.7.3"
 }
 
 # Outputs
