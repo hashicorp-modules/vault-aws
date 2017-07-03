@@ -38,7 +38,7 @@ You can pass Terraform variables during `terraform apply` or in a
 
 ## Images
 
-- [vault-server.json Packer template](https://github.com/hashicorp-modules/packer-templates/blob/master/vault/vault-server.json)
+- [vault.json Packer template](https://github.com/hashicorp-modules/packer-templates/blob/master/vault/vault.json)
 
 ## Usage
 

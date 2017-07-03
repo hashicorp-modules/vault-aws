@@ -3,14 +3,14 @@ terraform {
 }
 
 module "images-aws" {
-  source        = "git@github.com:hashicorp-modules/images-aws.git?ref=2017-05-26"
+  source        = "git@github.com:hashicorp-modules/images-aws.git?ref=2017-07-03"
   vault_version = "${var.vault_version}"
   os            = "${var.os}"
   os_version    = "${var.os_version}"
 }
 
 resource "aws_iam_role" "vault_server" {
-  name               = "${var.cluster_name}-VaultServer"
+  name               = "${var.cluster_name}-Vault-Server"
   assume_role_policy = "${data.aws_iam_policy_document.assume_role.json}"
 }
 
@@ -21,7 +21,7 @@ resource "aws_iam_role_policy" "vault_server" {
 }
 
 resource "aws_iam_instance_profile" "vault_server" {
-  name = "${var.cluster_name}-VaultServer"
+  name = "${var.cluster_name}-Vault-Server"
   role = "${aws_iam_role.vault_server.name}"
 }
 
