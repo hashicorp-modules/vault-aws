@@ -41,6 +41,8 @@ if [[ "${vault_use_tls}" = "true" ]]; then
   chown vault:vault /etc/vault.d/vault-tls.hcl
   mv /etc/vault.d/vault-no-tls.hcl /etc/vault.d/vault-no-tls.hcl.example
   echo "export VAULT_ADDR=https://127.0.0.1:8200" | tee /etc/profile.d/vault.sh
+else
+  echo "export VAULT_ADDR=http://127.0.0.1:8200" | tee /etc/profile.d/vault.sh
 fi
 
 # start consul and vault once they are configured correctly
