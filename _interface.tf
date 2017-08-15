@@ -58,11 +58,6 @@ variable "instance_type" {
   description = "AWS instance type to use eg m4.large"
 }
 
-variable "region" {
-  default     = "us-west-1"
-  description = "Region to deploy vault cluster ie us-west-1"
-}
-
 variable "vault_use_tls" {
   default     = "true"
   description = "Use TLS for vault communication: true/false"
