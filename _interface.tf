@@ -29,6 +29,10 @@ variable "subnet_ids" {
   description = "Pre-existing Subnet ID(s) to use"
 }
 
+variable "vault_version" {
+  description = "Vault version to use eg 0.7.3 or 0.7.3+ent"
+}
+
 variable "vpc_id" {
   description = "Pre-existing VPC ID to use"
 }
@@ -44,6 +48,11 @@ variable "consul_as_server" {
   description = "Run the consul agent in server mode: true/false"
 }
 
+variable "environment" {
+  default     = "production"
+  description = "Environment eg development, stage or production"
+}
+
 variable "instance_type" {
   default     = "m4.large"
   description = "AWS instance type to use eg m4.large"
@@ -57,11 +66,6 @@ variable "region" {
 variable "vault_use_tls" {
   default     = "true"
   description = "Use TLS for vault communication: true/false"
-}
-
-variable "vault_version" {
-  default     = "0.7.3"
-  description = "Vault version to use ie 0.7.3"
 }
 
 # Outputs
