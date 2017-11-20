@@ -77,7 +77,7 @@ module "consul_client_sg" {
   source = "../consul-client-ports-aws"
   # source = "git@github.com:hashicorp-modules/consul-client-ports-aws?ref=f-refactor"
 
-  name        = "${var.name}-consul-client"
+  name        = "${var.name}-vault-consul-client"
   vpc_id      = "${var.vpc_id}"
   cidr_blocks = ["${var.public_ip != "false" ? "0.0.0.0/0" : var.vpc_cidr}"] # If there's a public IP, open Consul ports for public access - DO NOT DO THIS IN PROD
 }

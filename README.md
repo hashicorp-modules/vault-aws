@@ -39,16 +39,25 @@ Consider using [hashicorp-guides/vault](https://github.com/hashicorp-guides/vaul
 - `vault_sg_id`: Vault security group ID.
 - `consul_sg_id`: Consul security group ID.
 
-## Module Dependencies
+## Submodules
+
+- [AWS Vault Server Ports Terraform Module](https://github.com/hashicorp-modules/vault-server-ports-aws)
+
+## Recommended Modules
+
+These are recommended modules you can use to populate required input variables for this module. The sub-bullets show the mapping of output variable --> required input variable for the respective modules.
 
 - [AWS SSH Keypair Terraform Module](https://github.com/hashicorp-modules/ssh-keypair-aws)
-  - [TLS Private Key Terraform Module](https://github.com/hashicorp-modules/tls-private-key)
+  - `ssh_key_name` --> `ssh_key_name`
 - [AWS Network Terraform Module](https://github.com/hashicorp-modules/network-aws/)
+  - `vpc_cidr_block` --> `vpc_cidr`
+  - `vpc_id` --> `vpc_id`
+  - `subnet_private_ids` --> `subnet_ids`
 - [AWS Vault Server Ports Terraform Module](https://github.com/hashicorp-modules/vault-server-ports-aws)
 
 ## Image Dependencies
 
-- [vault.json Packer template](https://github.com/hashicorp-modules/packer-templates/blob/master/vault/vault.json)
+- [vault.json Packer template](https://github.com/hashicorp/guides-configuration/blob/master/vault/vault.json)
 
 ## Authors
 
