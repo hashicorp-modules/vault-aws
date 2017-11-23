@@ -46,6 +46,11 @@ variable "public_ip" {
   description = "Associate a public IP address to the Vault nodes, defaults to \"false\"."
 }
 
+variable "image_id" {
+  default     = ""
+  description = "AMI to use, defaults to the HashiStack AMI."
+}
+
 variable "instance_profile" {
   default     = ""
   description = "AWS instance profile to use."

@@ -95,7 +95,7 @@ resource "aws_launch_configuration" "vault_server" {
   associate_public_ip_address = "${var.public_ip != "false" ? true : false}"
   ebs_optimized               = false
   iam_instance_profile        = "${var.instance_profile != "" ? var.instance_profile : module.consul_auto_join_instance_role.instance_profile_id}"
-  image_id                    = "${data.aws_ami.vault.id}"
+  image_id                    = "${var.image_id != "" ? var.image_id : data.aws_ami.vault.id}"
   instance_type               = "${var.instance_type}"
   user_data                   = "${data.template_file.vault_init.rendered}"
   key_name                    = "${var.ssh_key_name}"

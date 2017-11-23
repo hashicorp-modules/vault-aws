@@ -28,6 +28,7 @@ Consider using [hashicorp-guides/vault](https://github.com/hashicorp-guides/vaul
 - `subnet_ids`: [Optional] Subnet ID(s) to provision resources in.
 - `count`: [Optional] Number of Vault nodes to provision across private subnets, defaults to private subnet count.
 - `public_ip`: [Optional] Associate a public IP address to the Vault nodes, defaults to "false".
+- `image_id`: [Optional] AMI to use, defaults to the HashiStack AMI.
 - `instance_profile`: [Optional] AWS instance profile to use.
 - `instance_type`: [Optional] AWS instance type for Consul node (e.g. "m4.large"), defaults to "t2.small".
 - `user_data`: [Optional] user_data script to pass in at runtime.
