@@ -40,7 +40,7 @@ Consider using [hashicorp-guides/vault](https://github.com/hashicorp-guides/vaul
 
 - `vault_asg_id`: Vault autoscaling group ID.
 - `vault_sg_id`: Vault security group ID.
-- `consul_sg_id`: Consul security group ID.
+- `vault_username`: The Vault host username.
 
 ## Submodules
 
