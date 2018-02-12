@@ -8,7 +8,7 @@ Provisions resources for a Vault auto-scaling group in AWS.
 
 This module requires a pre-existing AWS key pair, VPC and subnet be available to deploy the auto-scaling group within. It's recommended you combine this module with [network-aws](https://github.com/hashicorp-modules/network-aws/) which provisions a VPC and a private and public subnet per AZ. See the usage section for further guidance.
 
-Consider using [hashicorp-guides/vault](https://github.com/hashicorp-guides/vault/blob/master/terraform-aws/) or checkout [examples](./examples) for fully functioning examples.
+Checkout [examples](./examples) for fully functioning examples.
 
 ### Environment Variables
 
