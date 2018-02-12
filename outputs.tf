@@ -1,5 +1,5 @@
 output "vault_asg_id" {
-  value = "${aws_autoscaling_group.vault_server.id}"
+  value = "${aws_autoscaling_group.vault.id}"
 }
 
 output "vault_sg_id" {
