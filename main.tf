@@ -117,27 +117,11 @@ resource "aws_autoscaling_group" "vault" {
   default_cooldown     = 30
   force_delete         = true
 
-  tag {
-    key                 = "Name"
-    value               = "${format("%s-vault-node", var.name)}"
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "Consul-Auto-Join"
-    value               = "${var.name}"
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "owner"
-    value               = "${var.owner}"
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "TTL"
-    value               = "${var.ttl}"
-    propagate_at_launch = true
-  }
+  tags = ["${concat(
+    list(
+      map("key", "Name", "value", format("%s-vault-node", var.name), "propagate_at_launch", true),
+      map("key", "Consul-Auto-Join", "value", var.name, "propagate_at_launch", true)
+    ),
+    var.tags
+  )}"]
 }
