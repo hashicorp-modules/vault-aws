@@ -11,6 +11,7 @@ module "consul_auto_join_instance_role" {
 data "aws_ami" "vault" {
   most_recent = true
   owners      = ["self"]
+  name_regex  = "vault-image_${lower(var.release_version)}_vault_${lower(var.vault_version)}_consul_${lower(var.consul_version)}_${lower(var.os)}_${var.os_version}.*"
 
   filter {
     name   = "tag:System"
@@ -24,12 +25,17 @@ data "aws_ami" "vault" {
 
   filter {
     name   = "tag:Release-Version"
-    values = ["${var.release_version}"]
+    values = ["${lower(var.release_version)}"]
   }
 
   filter {
     name   = "tag:Vault-Version"
-    values = ["${var.vault_version}"]
+    values = ["${lower(var.vault_version)}"]
+  }
+
+  filter {
+    name   = "tag:Consul-Version"
+    values = ["${lower(var.consul_version)}"]
   }
 
   filter {
@@ -89,6 +95,7 @@ resource "aws_security_group_rule" "ssh" {
 }
 
 resource "aws_launch_configuration" "vault" {
+  name_prefix                 = "${format("%s-vault-lc-", var.name)}"
   associate_public_ip_address = "${var.public_ip != "false" ? true : false}"
   ebs_optimized               = false
   iam_instance_profile        = "${var.instance_profile != "" ? var.instance_profile : element(module.consul_auto_join_instance_role.instance_profile_id, 0)}"
@@ -108,9 +115,9 @@ resource "aws_launch_configuration" "vault" {
 }
 
 resource "aws_autoscaling_group" "vault" {
+  name_prefix          = "${format("%s-vault-asg-", var.name)}"
   launch_configuration = "${aws_launch_configuration.vault.id}"
   vpc_zone_identifier  = ["${var.subnet_ids}"]
-  name                 = "${var.name}-vault"
   max_size             = "${var.count != "-1" ? var.count : length(var.subnet_ids)}"
   min_size             = "${var.count != "-1" ? var.count : length(var.subnet_ids)}"
   desired_capacity     = "${var.count != "-1" ? var.count : length(var.subnet_ids)}"

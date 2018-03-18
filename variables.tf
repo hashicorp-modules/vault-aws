@@ -13,6 +13,11 @@ variable "vault_version" {
   description = "Vault version tag (e.g. 0.8.1 or 0.8.1-ent), defaults to \"0.8.1\"."
 }
 
+variable "consul_version" {
+  default     = "0.9.2"
+  description = "Consul version tag (e.g. 0.9.2 or 0.9.2-ent), defaults to \"0.9.2\"."
+}
+
 variable "os" {
   default     = "RHEL"
   description = "Operating System (e.g. RHEL or Ubuntu), defaults to \"RHEL\"."
