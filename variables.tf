@@ -1,3 +1,8 @@
+variable "create" {
+  description = "Create Module, defaults to true."
+  default     = true
+}
+
 variable "name" {
   default     = "vault-aws"
   description = "Name for resources, defaults to \"vault-aws\"."
