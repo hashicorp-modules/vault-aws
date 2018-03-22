@@ -3,8 +3,7 @@ terraform {
 }
 
 module "consul_auto_join_instance_role" {
-  # source = "github.com/hashicorp-modules/consul-auto-join-instance-role-aws?ref=f-refactor"
-  source = "../consul-auto-join-instance-role-aws"
+  source = "github.com/hashicorp-modules/consul-auto-join-instance-role-aws?ref=f-refactor"
 
   create = "${var.create ? 1 : 0}"
   name   = "${var.name}"
@@ -74,8 +73,7 @@ data "template_file" "vault_init" {
 }
 
 module "vault_server_sg" {
-  # source = "github.com/hashicorp-modules/vault-server-ports-aws?ref=f-refactor"
-  source = "../vault-server-ports-aws"
+  source = "github.com/hashicorp-modules/vault-server-ports-aws?ref=f-refactor"
 
   create      = "${var.create ? 1 : 0}"
   name        = "${var.name}-vault-server"
@@ -84,8 +82,7 @@ module "vault_server_sg" {
 }
 
 module "consul_client_sg" {
-  # source = "github.com/hashicorp-modules/consul-client-ports-aws?ref=f-refactor"
-  source = "../consul-client-ports-aws"
+  source = "github.com/hashicorp-modules/consul-client-ports-aws?ref=f-refactor"
 
   create      = "${var.create ? 1 : 0}"
   name        = "${var.name}-vault-consul-client"
