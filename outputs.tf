@@ -1,9 +1,133 @@
-output "vault_asg_id" {
-  value = "${element(concat(aws_autoscaling_group.vault.*.id, list("")), 0)}" # TODO: Workaround for issue #11210
+output "zREADME" {
+  value = <<README
+# ------------------------------------------------------------------------------
+# Vault Dev Guide Setup
+# ------------------------------------------------------------------------------
+
+If you're following the "Dev Guide" with the provided defaults, Vault is
+running in -dev mode and using the in-memory storage backend.
+
+The Root token for your Vault -dev instance has been set to "root" and placed in
+`/srv/vault/.vault-token`, the `VAULT_TOKEN` environment variable has already
+been set by default.
+
+  $ echo $${VAULT_TOKEN} # Vault Token being used to authenticate to Vault
+  $ sudo cat /srv/vault/.vault-token # Vault Token has also been placed here
+
+If you're using a storage backend other than in-mem (-dev mode), you will need
+to initialize Vault using steps 2 & 3 below.
+
+# ------------------------------------------------------------------------------
+# Vault Quick Start/Best Practices Guide Setup
+# ------------------------------------------------------------------------------
+
+If you're following the "Quick Start Guide", you won't be able to start
+interacting with Vault from the Bastion host yet as the Vault server has not
+been initialized & unsealed. Follow the below steps to set this up.
+
+1.) SSH into one of the Vault servers registered with Consul, you can use the
+below command to accomplish this automatically (we'll use Consul DNS moving
+forward once Vault is unsealed).
+
+  $ ssh -A ${lookup(var.users, var.os)}@$(curl http://127.0.0.1:8500/v1/agent/members | jq -M -r \
+      '[.[] | select(.Name | contains ("${var.name}-vault")) | .Addr][0]')
+
+2.) Initialize Vault
+
+  $ vault operator init
+
+3.) Unseal Vault using the "Unseal Keys" output from the `vault init` command
+and check the seal status.
+
+  $ vault operator unseal <UNSEAL_KEY_1>
+  $ vault operator unseal <UNSEAL_KEY_2>
+  $ vault operator unseal <UNSEAL_KEY_3>
+  $ vault status
+
+Repeat steps 1.) and 3.) to unseal the other "standby" Vault servers as well to
+achieve high availablity.
+
+4.) Logout of the Vault server (ctrl+d) and check Vault's seal status from the
+Bastion host to verify you can interact with the Vault cluster from the Bastion
+host Vault CLI.
+
+  $ vault status
+
+# ------------------------------------------------------------------------------
+# Vault Getting Started Instructions
+# ------------------------------------------------------------------------------
+
+You can interact with Vault using any of the
+CLI (https://www.vaultproject.io/docs/commands/index.html) or
+API (https://www.vaultproject.io/api/index.html) commands.
+${var.public ? format("\nView the Vault UI: %s\n\nThe Vault nodes are in a public subnet with UI & SSH access open from the\ninternet. WARNING - DO NOT DO THIS IN PRODUCTION!\n", "${module.vault_lb_aws.vault_lb_dns}") : ""}
+To start interacting with Vault, set your Vault token to authenticate requests.
+
+If using the "Vault Dev Guide", Vault is running in -dev mode & this has been set
+to "root" for you. Otherwise we will use the "Initial Root Token" that was output
+from the `vault operator init` command.
+
+  $ echo $${VAULT_ADDR} # Address you will be using to interact with Vault
+  $ echo $${VAULT_TOKEN} # Vault Token being used to authenticate to Vault
+  $ export VAULT_TOKEN=<ROOT_TOKEN> # If Vault token has not been set
+
+  # Use Vault's CLI to write and read a generic secret
+  $ vault write secret/cli foo=bar
+  $ vault read secret/cli
+
+  # Use Vault's HTTP API with Consul DNS to write and read a generic secret
+  # with Vault's KV secret engine
+  $ curl \
+      -H "X-Vault-Token: $${VAULT_TOKEN}" \
+      -X POST \
+      -d '{"foo":"bar"}' \
+      $${VAULT_ADDR}/v1/secret/api | jq '.'
+  $ curl \
+      -H "X-Vault-Token: $${VAULT_TOKEN}" \
+      $${VAULT_ADDR}/v1/secret/api | jq '.'
+
+  # If following the Best Practices Guide, be sure to pass certificates along
+  # with cURL to Vault's HTTP API to write and read a generic secret to Vault's
+  # KV secret engine
+  $ curl \
+      -H "X-Vault-Token: $VAULT_TOKEN" \
+      -X POST \
+      -d '{"foo":"bar"}' \
+      -k --cacert /opt/vault/tls/ca.crt --cert /opt/vault/tls/vault.crt --key /opt/vault/tls/vault.key \
+      $${VAULT_ADDR}/v1/secret/api | jq '.'
+  $ curl \
+      -H "X-Vault-Token: $VAULT_TOKEN" \
+      -k --cacert /opt/vault/tls/ca.crt --cert /opt/vault/tls/vault.crt --key /opt/vault/tls/vault.key \
+      $${VAULT_ADDR}/v1/secret/api | jq '.'
+README
+}
+
+output "consul_sg_id" {
+  value = "${module.consul_client_sg.consul_client_sg_id}"
 }
 
 output "vault_sg_id" {
   value = "${module.vault_server_sg.vault_server_sg_id}"
+}
+
+output "vault_lb_sg_id" {
+  value = "${module.vault_lb_aws.vault_lb_sg_id}"
+}
+
+output "vault_tg_http_8200_arn" {
+  value = "${module.vault_lb_aws.vault_tg_http_8200_arn}"
+}
+
+output "vault_tg_https_8200_arn" {
+  value = "${module.vault_lb_aws.vault_tg_https_8200_arn}"
+}
+
+output "vault_lb_dns" {
+  value = "${module.vault_lb_aws.vault_lb_dns}"
+}
+
+output "vault_asg_id" {
+  value = "${element(concat(aws_autoscaling_group.vault.*.id, list("")), 0)}"
 }
 
 output "vault_username" {
