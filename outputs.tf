@@ -1,7 +1,7 @@
 output "zREADME" {
   value = <<README
 # ------------------------------------------------------------------------------
-# Vault Dev Guide Setup
+# ${var.name} Vault Dev Guide Setup
 # ------------------------------------------------------------------------------
 
 If you're following the "Dev Guide" with the provided defaults, Vault is
@@ -18,12 +18,13 @@ If you're using a storage backend other than in-mem (-dev mode), you will need
 to initialize Vault using steps 2 & 3 below.
 
 # ------------------------------------------------------------------------------
-# Vault Quick Start/Best Practices Guide Setup
+# ${var.name} Vault Quick Start/Best Practices Guide Setup
 # ------------------------------------------------------------------------------
 
-If you're following the "Quick Start Guide", you won't be able to start
-interacting with Vault from the Bastion host yet as the Vault server has not
-been initialized & unsealed. Follow the below steps to set this up.
+If you're following the "Quick Start Guide" or "Best Practices" guide, you won't
+be able to start interacting with Vault from the Bastion host yet as the Vault
+server has not been initialized & unsealed. Follow the below steps to set this
+up.
 
 1.) SSH into one of the Vault servers registered with Consul, you can use the
 below command to accomplish this automatically (we'll use Consul DNS moving
@@ -54,7 +55,7 @@ host Vault CLI.
   $ vault status
 
 # ------------------------------------------------------------------------------
-# Vault Getting Started Instructions
+# ${var.name} Vault Getting Started Instructions
 # ------------------------------------------------------------------------------
 
 You can interact with Vault using any of the
@@ -71,34 +72,48 @@ from the `vault operator init` command.
   $ echo $${VAULT_TOKEN} # Vault Token being used to authenticate to Vault
   $ export VAULT_TOKEN=<ROOT_TOKEN> # If Vault token has not been set
 
-  # Use Vault's CLI to write and read a generic secret
+Use the CLI to write and read a generic secret.
+
   $ vault write secret/cli foo=bar
   $ vault read secret/cli
 
-  # Use Vault's HTTP API with Consul DNS to write and read a generic secret
-  # with Vault's KV secret engine
-  $ curl \
-      -H "X-Vault-Token: $${VAULT_TOKEN}" \
-      -X POST \
-      -d '{"foo":"bar"}' \
-      $${VAULT_ADDR}/v1/secret/api | jq '.'
-  $ curl \
-      -H "X-Vault-Token: $${VAULT_TOKEN}" \
-      $${VAULT_ADDR}/v1/secret/api | jq '.'
+Use the HTTP API with Consul DNS to write and read a generic secret with
+Vault's KV secret engine.
 
-  # If following the Best Practices Guide, be sure to pass certificates along
-  # with cURL to Vault's HTTP API to write and read a generic secret to Vault's
-  # KV secret engine
-  $ curl \
-      -H "X-Vault-Token: $VAULT_TOKEN" \
-      -X POST \
-      -d '{"foo":"bar"}' \
-      -k --cacert /opt/vault/tls/ca.crt --cert /opt/vault/tls/vault.crt --key /opt/vault/tls/vault.key \
+${!var.use_lb_cert ?
+"If you're making HTTP API requests to Vault from the Bastion host,
+the below env var has been set for you.
+
+  $ export VAULT_ADDR=http://vault.service.vault:8200
+
+  $ curl \\
+      -H \"X-Vault-Token: $${VAULT_TOKEN}\" \\
+      -X POST \\
+      -d '{\"foo\":\"bar\"}' \\
       $${VAULT_ADDR}/v1/secret/api | jq '.'
-  $ curl \
-      -H "X-Vault-Token: $VAULT_TOKEN" \
-      -k --cacert /opt/vault/tls/ca.crt --cert /opt/vault/tls/vault.crt --key /opt/vault/tls/vault.key \
+  $ curl \\
+      -H \"X-Vault-Token: $${VAULT_TOKEN}\" \\
+      $${VAULT_ADDR}/v1/secret/api | jq '.'"
+:
+"If you're making HTTPS API requests to Vault from the Bastion host,
+the below env vars have been set for you.
+
+  $ export VAULT_ADDR=https://vault.service.vault:8200
+  $ export VAULT_CACERT=/opt/vault/tls/vault-ca.crt
+  $ export VAULT_CLIENT_CERT=/opt/vault/tls/vault.crt
+  $ export VAULT_CLIENT_KEY=/opt/vault/tls/vault.key
+
+  $ curl \\
+      -H \"X-Vault-Token: $VAULT_TOKEN\" \\
+      -X POST \\
+      -d '{\"foo\":\"bar\"}' \\
+      -k --cacert /opt/vault/tls/ca.crt --cert /opt/vault/tls/vault.crt --key /opt/vault/tls/vault.key \\
       $${VAULT_ADDR}/v1/secret/api | jq '.'
+  $ curl \\
+      -H \"X-Vault-Token: $VAULT_TOKEN\" \\
+      -k --cacert /opt/vault/tls/ca.crt --cert /opt/vault/tls/vault.crt --key /opt/vault/tls/vault.key \\
+      $${VAULT_ADDR}/v1/secret/api | jq '.'"
+}
 README
 }
 
