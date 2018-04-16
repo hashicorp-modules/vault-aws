@@ -61,7 +61,7 @@ host Vault CLI.
 You can interact with Vault using any of the
 CLI (https://www.vaultproject.io/docs/commands/index.html) or
 API (https://www.vaultproject.io/api/index.html) commands.
-${var.public ? format("\nView the Vault UI: %s\n\nThe Vault nodes are in a public subnet with UI & SSH access open from the\ninternet. WARNING - DO NOT DO THIS IN PRODUCTION!\n", "${module.vault_lb_aws.vault_lb_dns}") : ""}
+${__builtin_StringToFloat(replace(replace(var.vault_version, "-ent", ""), ".", "")) >= 0100 || replace(var.vault_version, "-ent", "") != var.vault_version ? format("\nVault UI: %s%s %s\n\n%s", var.use_lb_cert ? "https://" : "http://", module.vault_lb_aws.vault_lb_dns, var.public ? "(Public)" : "(Internal)", var.public ? "The Vault nodes are in a public subnet with UI & SSH access open from the\ninternet. WARNING - DO NOT DO THIS IN PRODUCTION!\n" : "The Vault node(s) are in a private subnet, UI access can only be achieved inside\nthe network through a VPN.\n") : ""}
 To start interacting with Vault, set your Vault token to authenticate requests.
 
 If using the "Vault Dev Guide", Vault is running in -dev mode & this has been set
@@ -90,10 +90,10 @@ the below env var has been set for you.
       -H \"X-Vault-Token: $${VAULT_TOKEN}\" \\
       -X POST \\
       -d '{\"foo\":\"bar\"}' \\
-      $${VAULT_ADDR}/v1/secret/api | jq '.'
+      $${VAULT_ADDR}/v1/secret/api | jq '.' # Write a KV secret
   $ curl \\
       -H \"X-Vault-Token: $${VAULT_TOKEN}\" \\
-      $${VAULT_ADDR}/v1/secret/api | jq '.'"
+      $${VAULT_ADDR}/v1/secret/api | jq '.' # Read a KV secret"
 :
 "If you're making HTTPS API requests to Vault from the Bastion host,
 the below env vars have been set for you.
@@ -107,12 +107,12 @@ the below env vars have been set for you.
       -H \"X-Vault-Token: $VAULT_TOKEN\" \\
       -X POST \\
       -d '{\"foo\":\"bar\"}' \\
-      -k --cacert /opt/vault/tls/ca.crt --cert /opt/vault/tls/vault.crt --key /opt/vault/tls/vault.key \\
-      $${VAULT_ADDR}/v1/secret/api | jq '.'
+      -k --cacert $${VAULT_CACERT} --cert $${VAULT_CLIENT_CERT} --key $${VAULT_CLIENT_KEY} \\
+      $${VAULT_ADDR}/v1/secret/api | jq '.' # Write a KV secret
   $ curl \\
       -H \"X-Vault-Token: $VAULT_TOKEN\" \\
-      -k --cacert /opt/vault/tls/ca.crt --cert /opt/vault/tls/vault.crt --key /opt/vault/tls/vault.key \\
-      $${VAULT_ADDR}/v1/secret/api | jq '.'"
+      -k --cacert $${VAULT_CACERT} --cert $${VAULT_CLIENT_CERT} --key $${VAULT_CLIENT_KEY} \\
+      $${VAULT_ADDR}/v1/secret/api | jq '.' # Read a KV secret"
 }
 README
 }

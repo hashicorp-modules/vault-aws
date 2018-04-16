@@ -21,7 +21,7 @@ Checkout [examples](./examples) for fully functioning examples.
 - `create`: [Optional] Create Module, defaults to true.
 - `name`: [Optional] Name for resources, defaults to "vault-aws".
 - `release_version`: [Optional] Release version tag to use (e.g. 0.1.0, 0.1.0-rc1, 0.1.0-beta1, 0.1.0-dev1), defaults to "0.1.0-dev1".
-- `vault_version`: [Optional] Vault version tag to use (e.g. 0.9.6 or 0.9.6-ent), defaults to "0.9.6".
+- `vault_version`: [Optional] Vault version tag to use (e.g. 0.10.0 or 0.10.0-ent), defaults to "0.10.0".
 - `consul_version`: [Optional] Consul version tag to use (e.g. 1.0.6 or 1.0.6-ent), defaults to "1.0.6".
 - `os`: [Optional] Operating System to use (e.g. RHEL or Ubuntu), defaults to "RHEL".
 - `os_version`: [Optional] Operating System version to use (e.g. 7.3 for RHEL or 16.04 for Ubuntu), defaults to "7.3".
@@ -40,10 +40,11 @@ Checkout [examples](./examples) for fully functioning examples.
 - `lb_private_key`: [Optional] Private key for LB IAM server certificate.
 - `lb_cert_chain`: [Optional] Certificate chain for LB IAM server certificate.
 - `lb_ssl_policy`: [Optional] SSL policy for LB, defaults to "ELBSecurityPolicy-2016-08".
-- `lb_logs_bucket`: [Optional] S3 bucket for LB access logs.
-- `lb_logs_prefix`: [Optional] S3 bucket prefix for LB access logs.
-- `lb_logs_enabled`: [Optional] S3 bucket LB access logs enabled.
-- `target_groups`: [Optional] List of target group ARNs to apply to the autoscaling group..
+- `lb_bucket`: [Optional] S3 bucket override for LB access logs, `lb_bucket_override` be set to true if overriding.
+- `lb_bucket_override`: [Optional] Override the default S3 bucket created for access logs, defaults to false, `lb_bucket` _must_ be set if true.
+- `lb_bucket_prefix`: [Optional] S3 bucket prefix for LB access logs.
+- `lb_logs_enabled`: [Optional] S3 bucket LB access logs enabled, defaults to true.
+- `target_groups`: [Optional] List of target group ARNs to apply to the autoscaling group.
 - `users`: [Optional] Map of SSH users.
 - `tags`: [Optional] Optional list of tag maps to set on resources, defaults to empty list.
 - `tags_list`: [Optional] Optional map of tags to set on resources, defaults to empty map.
