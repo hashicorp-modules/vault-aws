@@ -89,7 +89,7 @@ the below env var has been set for you.
   $ curl \\
       -H \"X-Vault-Token: $${VAULT_TOKEN}\" \\
       -X POST \\
-      -d '{\"data\": {\"foo\":\"bar\"}}' \\
+      -d '{\"foo\":\"bar\"}' \\
       $${VAULT_ADDR}/v1/secret/api | jq '.' # Write a KV secret
   $ curl \\
       -H \"X-Vault-Token: $${VAULT_TOKEN}\" \\
@@ -106,7 +106,7 @@ the below env vars have been set for you.
   $ curl \\
       -H \"X-Vault-Token: $VAULT_TOKEN\" \\
       -X POST \\
-      -d '{\"data\": {\"foo\":\"bar\"}}' \\
+      -d '{\"foo\":\"bar\"}' \\
       -k --cacert $${VAULT_CACERT} --cert $${VAULT_CLIENT_CERT} --key $${VAULT_CLIENT_KEY} \\
       $${VAULT_ADDR}/v1/secret/api | jq '.' # Write a KV secret
   $ curl \\
