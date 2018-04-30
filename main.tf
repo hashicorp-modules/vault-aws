@@ -7,7 +7,7 @@ provider "aws" {
 }
 
 module "consul_auto_join_instance_role" {
-  source = "github.com/hashicorp-modules/consul-auto-join-instance-role-aws?ref=f-refactor"
+  source = "github.com/hashicorp-modules/consul-auto-join-instance-role-aws"
 
   create = "${var.create ? 1 : 0}"
   name   = "${var.name}"
@@ -76,7 +76,7 @@ data "template_file" "vault_init" {
 }
 
 module "vault_server_sg" {
-  source = "github.com/hashicorp-modules/vault-server-ports-aws?ref=f-refactor"
+  source = "github.com/hashicorp-modules/vault-server-ports-aws"
 
   create      = "${var.create ? 1 : 0}"
   name        = "${var.name}-vault-server"
@@ -85,7 +85,7 @@ module "vault_server_sg" {
 }
 
 module "consul_client_sg" {
-  source = "github.com/hashicorp-modules/consul-client-ports-aws?ref=f-refactor"
+  source = "github.com/hashicorp-modules/consul-client-ports-aws"
 
   create      = "${var.create ? 1 : 0}"
   name        = "${var.name}-vault-consul-client"
@@ -127,7 +127,7 @@ resource "aws_launch_configuration" "vault" {
 }
 
 module "vault_lb_aws" {
-  source = "github.com/hashicorp-modules/vault-lb-aws?ref=f-refactor"
+  source = "github.com/hashicorp-modules/vault-lb-aws"
 
   create             = "${var.create}"
   name               = "${var.name}"
