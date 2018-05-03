@@ -150,11 +150,12 @@ module "vault_lb_aws" {
 resource "aws_autoscaling_group" "vault" {
   count = "${var.create ? 1 : 0}"
 
-  name_prefix          = "${format("%s-vault-", var.name)}"
+  name_prefix          = "${aws_launch_configuration.vault.name}"
   launch_configuration = "${aws_launch_configuration.vault.id}"
   vpc_zone_identifier  = ["${var.subnet_ids}"]
   max_size             = "${var.count != -1 ? var.count : length(var.subnet_ids)}"
   min_size             = "${var.count != -1 ? var.count : length(var.subnet_ids)}"
+  min_elb_capacity     = "${var.count != -1 ? var.count : length(var.subnet_ids)}"
   desired_capacity     = "${var.count != -1 ? var.count : length(var.subnet_ids)}"
   default_cooldown     = 30
   force_delete         = true
@@ -174,4 +175,8 @@ resource "aws_autoscaling_group" "vault" {
     ),
     var.tags_list
   )}"]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
