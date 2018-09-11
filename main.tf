@@ -41,7 +41,7 @@ module "vault_server_sg" {
   create      = "${var.create ? 1 : 0}"
   name        = "${var.name}-vault-server"
   vpc_id      = "${var.vpc_id}"
-  cidr_blocks = ["${split(",", length(compact(var.cidr_blocks)) > 0 ? join(",", compact(var.cidr_blocks)) : var.vpc_cidr)}"]
+  cidr_blocks = ["${var.vpc_cidr}"]
 }
 
 module "consul_client_sg" {
@@ -50,7 +50,7 @@ module "consul_client_sg" {
   create      = "${var.create ? 1 : 0}"
   name        = "${var.name}-vault-consul-client"
   vpc_id      = "${var.vpc_id}"
-  cidr_blocks = ["${split(",", length(compact(var.cidr_blocks)) > 0 ? join(",", compact(var.cidr_blocks)) : var.vpc_cidr)}"]
+  cidr_blocks = ["${var.vpc_cidr}"]
 }
 
 resource "aws_security_group_rule" "ssh" {
@@ -61,14 +61,27 @@ resource "aws_security_group_rule" "ssh" {
   protocol          = "tcp"
   from_port         = 22
   to_port           = 22
-  cidr_blocks       = ["${split(",", length(compact(var.cidr_blocks)) > 0 ? join(",", compact(var.cidr_blocks)) : var.vpc_cidr)}"]
+  cidr_blocks       = ["${split(",", length(compact(var.lb_cidr_blocks)) > 0 ? join(",", compact(var.lb_cidr_blocks)) : var.vpc_cidr)}"]
+  description       = "SSH access to Vault node"
+}
+
+resource "aws_security_group_rule" "wetty_tcp" {
+  count = "${var.create ? 1 : 0}"
+
+  security_group_id = "${module.vault_server_sg.vault_server_sg_id}"
+  type              = "ingress"
+  protocol          = "tcp"
+  from_port         = 3030
+  to_port           = 3030
+  cidr_blocks       = ["${split(",", length(compact(var.lb_cidr_blocks)) > 0 ? join(",", compact(var.lb_cidr_blocks)) : var.vpc_cidr)}"]
+  description       = "Wetty inbound TCP traffic to Vault node"
 }
 
 resource "aws_launch_configuration" "vault" {
   count = "${var.create ? 1 : 0}"
 
   name_prefix                 = "${format("%s-vault-", var.name)}"
-  associate_public_ip_address = "${var.public}"
+  associate_public_ip_address = "${!var.lb_internal}"
   ebs_optimized               = false
   instance_type               = "${var.instance_type}"
   image_id                    = "${var.image_id != "" ? var.image_id : element(concat(data.aws_ami.vault.*.id, list("")), 0)}" # TODO: Workaround for issue #11210
@@ -93,10 +106,10 @@ module "vault_lb_aws" {
   create             = "${var.create}"
   name               = "${var.name}"
   vpc_id             = "${var.vpc_id}"
-  cidr_blocks        = ["${split(",", length(compact(var.cidr_blocks)) > 0 ? join(",", compact(var.cidr_blocks)) : var.vpc_cidr)}"]
+  cidr_blocks        = ["${split(",", length(compact(var.lb_cidr_blocks)) > 0 ? join(",", compact(var.lb_cidr_blocks)) : var.vpc_cidr)}"]
   subnet_ids         = ["${var.subnet_ids}"]
-  is_internal_lb     = "${!var.public}"
-  use_lb_cert        = "${var.use_lb_cert}"
+  lb_internal        = "${var.lb_internal}"
+  lb_use_cert        = "${var.lb_use_cert}"
   lb_cert            = "${var.lb_cert}"
   lb_private_key     = "${var.lb_private_key}"
   lb_cert_chain      = "${var.lb_cert_chain}"

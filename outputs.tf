@@ -61,7 +61,7 @@ host Vault CLI.
 You can interact with Vault using any of the
 CLI (https://www.vaultproject.io/docs/commands/index.html) or
 API (https://www.vaultproject.io/api/index.html) commands.
-${__builtin_StringToFloat(replace(replace(var.vault_version, "-ent", ""), ".", "")) >= 0100 || replace(var.vault_version, "-ent", "") != var.vault_version ? format("\nVault UI: %s%s %s\n\n%s", var.use_lb_cert ? "https://" : "http://", module.vault_lb_aws.vault_lb_dns, var.public ? "(Public)" : "(Internal)", var.public ? "The Vault nodes are in a public subnet with UI & SSH access open from the\ninternet. WARNING - DO NOT DO THIS IN PRODUCTION!\n" : "The Vault node(s) are in a private subnet, UI access can only be achieved inside\nthe network through a VPN.\n") : ""}
+${__builtin_StringToFloat(replace(replace(var.vault_version, "-ent", ""), ".", "")) >= 0100 || replace(var.vault_version, "-ent", "") != var.vault_version ? format("\nVault UI: %s%s %s\n\n%s", var.lb_use_cert ? "https://" : "http://", module.vault_lb_aws.vault_lb_dns, !var.lb_internal ? "(Public)" : "(Internal)", !var.lb_internal ? "The Vault nodes are in a public subnet with UI & SSH access open from the\ninternet. WARNING - DO NOT DO THIS IN PRODUCTION!\n" : "The Vault node(s) are in a private subnet, UI access can only be achieved inside\nthe network.\n") : ""}
 To start interacting with Vault, set your Vault token to authenticate requests.
 
 If using the "Vault Dev Guide", Vault is running in -dev mode & this has been set
@@ -80,7 +80,7 @@ Use the CLI to write and read a generic secret.
 Use the HTTP API with Consul DNS to write and read a generic secret with
 Vault's KV secret engine.
 
-${!var.use_lb_cert ?
+${!var.lb_use_cert ?
 "If you're making HTTP API requests to Vault from the Bastion host,
 the below env var has been set for you.
 
@@ -125,8 +125,28 @@ output "vault_sg_id" {
   value = "${module.vault_server_sg.vault_server_sg_id}"
 }
 
-output "vault_lb_sg_id" {
-  value = "${module.vault_lb_aws.vault_lb_sg_id}"
+output "vault_app_lb_sg_id" {
+  value = "${module.vault_lb_aws.vault_app_lb_sg_id}"
+}
+
+output "vault_lb_arn" {
+  value = "${module.vault_lb_aws.vault_lb_arn}"
+}
+
+output "vault_app_lb_dns" {
+  value = "${module.vault_lb_aws.vault_app_lb_dns}"
+}
+
+output "vault_network_lb_dns" {
+  value = "${module.vault_lb_aws.vault_network_lb_dns}"
+}
+
+output "vault_tg_tcp_22_arn" {
+  value = "${module.vault_lb_aws.vault_tg_tcp_22_arn}"
+}
+
+output "vault_tg_tcp_8200_arn" {
+  value = "${module.vault_lb_aws.vault_tg_tcp_8200_arn}"
 }
 
 output "vault_tg_http_8200_arn" {
@@ -137,8 +157,12 @@ output "vault_tg_https_8200_arn" {
   value = "${module.vault_lb_aws.vault_tg_https_8200_arn}"
 }
 
-output "vault_lb_dns" {
-  value = "${module.vault_lb_aws.vault_lb_dns}"
+output "vault_tg_http_3030_arn" {
+  value = "${module.vault_lb_aws.vault_tg_http_3030_arn}"
+}
+
+output "vault_tg_https_3030_arn" {
+  value = "${module.vault_lb_aws.vault_tg_https_3030_arn}"
 }
 
 output "vault_asg_id" {
