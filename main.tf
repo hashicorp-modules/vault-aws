@@ -12,6 +12,7 @@ module "consul_auto_join_instance_role" {
 data "aws_ami" "vault" {
   count       = "${var.create && var.image_id == "" ? 1 : 0}"
   most_recent = true
+  owners      = ["${var.ami_owner}"]
   name_regex  = "vault-image_${lower(var.release_version)}_vault_${lower(var.vault_version)}_consul_${lower(var.consul_version)}_${lower(var.os)}_${var.os_version}.*"
 
   filter {

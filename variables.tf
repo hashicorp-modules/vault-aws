@@ -8,19 +8,24 @@ variable "name" {
   default     = "vault-aws"
 }
 
+variable "ami_owner" {
+  description = "Account ID of AMI owner."
+  default     = "012230895537" # HashiCorp Public AMI AWS account
+}
+
 variable "release_version" {
   description = "Release version tag (e.g. 0.1.0, 0.1.0-rc1, 0.1.0-beta1, 0.1.0-dev1), defaults to \"0.1.0\", view releases at https://github.com/hashicorp/guides-configuration#hashistack-version-tables"
   default     = "0.1.0"
 }
 
 variable "vault_version" {
-  description = "Vault version tag (e.g. 0.10.3 or 0.10.3-ent), defaults to \"0.10.3\"."
-  default     = "0.10.3"
+  description = "Vault version tag (e.g. 0.11.3 or 0.11.3-ent), defaults to \"0.11.3\"."
+  default     = "0.11.3"
 }
 
 variable "consul_version" {
-  description = "Consul version tag (e.g. 1.2.0 or 1.2.0-ent), defaults to \"1.2.0\"."
-  default     = "1.2.0"
+  description = "Consul version tag (e.g. 1.2.3 or 1.2.3-ent), defaults to \"1.2.3\"."
+  default     = "1.2.3"
 }
 
 variable "os" {
