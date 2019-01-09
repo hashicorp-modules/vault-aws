@@ -42,7 +42,7 @@ module "vault_server_sg" {
   create      = "${var.create ? 1 : 0}"
   name        = "${var.name}-vault-server"
   vpc_id      = "${var.vpc_id}"
-  cidr_blocks = ["${var.public ? "0.0.0.0/0" : var.vpc_cidr}"] # If there's a public IP, open Vault ports for public access - DO NOT DO THIS IN PROD
+  cidr_blocks = ["${var.public_vault ? "0.0.0.0/0" : var.vpc_cidr}"] # If public_vault is true, open Vault ports for public access - DO NOT DO THIS IN PROD
 }
 
 module "consul_client_sg" {
@@ -51,7 +51,7 @@ module "consul_client_sg" {
   create      = "${var.create ? 1 : 0}"
   name        = "${var.name}-vault-consul-client"
   vpc_id      = "${var.vpc_id}"
-  cidr_blocks = ["${var.public ? "0.0.0.0/0" : var.vpc_cidr}"] # If there's a public IP, open Consul ports for public access - DO NOT DO THIS IN PROD
+  cidr_blocks = ["${var.public_consul ? "0.0.0.0/0" : var.vpc_cidr}"] # If public_consul is true, open Consul ports for public access - DO NOT DO THIS IN PROD
 }
 
 resource "aws_security_group_rule" "ssh" {
@@ -62,7 +62,7 @@ resource "aws_security_group_rule" "ssh" {
   protocol          = "tcp"
   from_port         = 22
   to_port           = 22
-  cidr_blocks       = ["${var.public ? "0.0.0.0/0" : var.vpc_cidr}"] # If there's a public IP, open port 22 for public access - DO NOT DO THIS IN PROD
+  cidr_blocks       = ["${var.public_vault_ssh ? "0.0.0.0/0" : var.vpc_cidr}"] # If public_vault_ssh is true, open port 22 for public access - DO NOT DO THIS IN PROD
 }
 
 resource "aws_launch_configuration" "vault" {
@@ -72,7 +72,7 @@ resource "aws_launch_configuration" "vault" {
   associate_public_ip_address = "${var.public}"
   ebs_optimized               = false
   instance_type               = "${var.instance_type}"
-  image_id                    = "${var.image_id != "" ? var.image_id : element(concat(data.aws_ami.vault.*.id, list("")), 0)}" # TODO: Workaround for issue #11210
+  image_id                    = "${var.image_id != "" ? var.image_id : element(concat(data.aws_ami.vault.*.id, list("")), 0)}"                     # TODO: Workaround for issue #11210
   iam_instance_profile        = "${var.instance_profile != "" ? var.instance_profile : module.consul_auto_join_instance_role.instance_profile_id}"
   user_data                   = "${data.template_file.vault_init.rendered}"
   key_name                    = "${var.ssh_key_name}"
@@ -93,9 +93,9 @@ module "vault_lb_aws" {
   create             = "${var.create}"
   name               = "${var.name}"
   vpc_id             = "${var.vpc_id}"
-  cidr_blocks        = ["${var.public ? "0.0.0.0/0" : var.vpc_cidr}"] # If there's a public IP, open port 22 for public access - DO NOT DO THIS IN PROD
+  cidr_blocks        = ["${var.public_vault_loadbalancer ? "0.0.0.0/0" : var.vpc_cidr}"] # If public_vault_loadbalancer is set to true, assign public ip and allow inbound
   subnet_ids         = ["${var.subnet_ids}"]
-  is_internal_lb     = "${!var.public}"
+  is_internal_lb     = "${!var.public_vault_loadbalancer}"
   use_lb_cert        = "${var.use_lb_cert}"
   lb_cert            = "${var.lb_cert}"
   lb_private_key     = "${var.lb_private_key}"

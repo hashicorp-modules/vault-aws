@@ -10,7 +10,7 @@ variable "name" {
 
 variable "ami_owner" {
   description = "Account ID of AMI owner."
-  default     = "012230895537" # HashiCorp Public AMI AWS account
+  default     = "012230895537"             # HashiCorp Public AMI AWS account
 }
 
 variable "release_version" {
@@ -53,6 +53,26 @@ variable "subnet_ids" {
 
 variable "public" {
   description = "Open up nodes to the public internet for easy access - DO NOT DO THIS IN PROD, defaults to false."
+  default     = false
+}
+
+variable "public_vault_ssh" {
+  description = "Open port 22 inbound to the Vault servers from the public internet - DO NOT DO THIS IN PROD, defaults to false."
+  default     = false
+}
+
+variable "public_vault_loadbalancer" {
+  description = "Assigns a public IP to the vault ELB. defaults to false."
+  default     = false
+}
+
+variable "public_vault" {
+  description = "Open the vault ports inbound from the internet - DO NOT DO THIS IN PROD, defaults to false."
+  default     = false
+}
+
+variable "public_consul" {
+  description = "Open the consul ports inbound from the public internet - DO NOT DO THIS IN PROD, defaults to false."
   default     = false
 }
 
