@@ -10,7 +10,7 @@ variable "name" {
 
 variable "ami_owner" {
   description = "Account ID of AMI owner."
-  default     = "012230895537" # HashiCorp Public AMI AWS account
+  default     = "012230895537"             # HashiCorp Public AMI AWS account
 }
 
 variable "release_version" {
@@ -155,4 +155,24 @@ variable "tags_list" {
   description = "Optional list of tag maps to set on resources, defaults to empty list."
   type        = "list"
   default     = []
+}
+
+variable "is_internal_lb" {
+  description = "Defines if the vault LB is internal only or not, defaults to false."
+  default     = false
+}
+
+variable "vault_public_access" {
+  description = "Defines if the vault servers get external IPs allowing direct access, defaults to false."
+  default     = false
+}
+
+variable "vault_lb_public_access" {
+  description = "Defines if the vault loadbalancer can be directly ssh'd to from public internet, defaults to false."
+  default     = false
+}
+
+variable "consul_public_access" {
+  description = "Defines if the consul servers can be directly ssh'd to from public internet, defaults to false."
+  default     = false
 }
