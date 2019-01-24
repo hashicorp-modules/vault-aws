@@ -56,6 +56,11 @@ variable "public" {
   default     = false
 }
 
+variable "lb_public" {
+  description = "Open up the vault load balancer to the public internet for easy access, defaults to true."
+  default     = true
+}
+
 variable "count" {
   description = "Number of Vault nodes to provision across private subnets, defaults to private subnet count."
   default     = -1
