@@ -42,7 +42,7 @@ module "vault_server_sg" {
   create      = "${var.create ? 1 : 0}"
   name        = "${var.name}-vault-server"
   vpc_id      = "${var.vpc_id}"
-  cidr_blocks = ["${var.public ? "0.0.0.0/0" : var.vpc_cidr}"] # If there's a public IP, open Vault ports for public access - DO NOT DO THIS IN PROD
+  cidr_blocks = ["${var.lb_public ? "0.0.0.0/0" : var.vpc_cidr}"] # If the Vault LB is public, open Vault ports for public access 
 }
 
 module "consul_client_sg" {
