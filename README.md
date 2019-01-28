@@ -44,6 +44,7 @@ Checkout [examples](./examples) for fully functioning examples.
 - `lb_bucket`: [Optional] S3 bucket override for LB access logs, `lb_bucket_override` be set to true if overriding.
 - `lb_bucket_override`: [Optional] Override the default S3 bucket created for access logs, defaults to false, `lb_bucket` _must_ be set if true.
 - `lb_bucket_prefix`: [Optional] S3 bucket prefix for LB access logs.
+- `lb_public`: [Optional] Set the vault load balancer to be public.
 - `lb_logs_enabled`: [Optional] S3 bucket LB access logs enabled, defaults to true.
 - `target_groups`: [Optional] List of target group ARNs to apply to the autoscaling group.
 - `users`: [Optional] Map of SSH users.
