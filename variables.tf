@@ -125,6 +125,12 @@ variable "lb_bucket_prefix" {
   default     = ""
 }
 
+variable "lb_inbound_cidrs" {
+  description = "The inbound CIDRS to allow traffic to the load balancer"
+  type = "list"
+  default = []
+}
+
 variable "lb_logs_enabled" {
   description = "S3 bucket LB access logs enabled, defaults to true."
   default     = true
