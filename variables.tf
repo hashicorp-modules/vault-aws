@@ -56,6 +56,11 @@ variable "public" {
   default     = false
 }
 
+variable "public_cidr" {
+  description = "CIDR to use for security group for public instances."
+  default     = "0.0.0.0/0"
+}
+
 variable "count" {
   description = "Number of Vault nodes to provision across private subnets, defaults to private subnet count."
   default     = -1
