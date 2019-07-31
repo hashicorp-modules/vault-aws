@@ -37,12 +37,13 @@ data "template_file" "vault_init" {
 }
 
 module "vault_server_sg" {
-  source = "github.com/hashicorp-modules/vault-server-ports-aws"
+  source = "github.com/rob-orr/vault-server-ports-aws"
 
   create      = "${var.create ? 1 : 0}"
   name        = "${var.name}-vault-server"
   vpc_id      = "${var.vpc_id}"
-  cidr_blocks = ["${var.public ? var.public_cidr : var.vpc_cidr}"] # If there's a public IP, open Vault ports for public access - DO NOT DO THIS IN PROD
+  cidr_blocks = ["${var.public ? var.public_cidr : var.vpc_cidr}"] # If there's a public IP, open Vault ports for public access.
+  vault_port  = "${var.vault_port}"
 }
 
 module "consul_client_sg" {
@@ -51,7 +52,7 @@ module "consul_client_sg" {
   create      = "${var.create ? 1 : 0}"
   name        = "${var.name}-vault-consul-client"
   vpc_id      = "${var.vpc_id}"
-  cidr_blocks = ["${var.public ? var.public_cidr : var.vpc_cidr}"] # If there's a public IP, open Consul ports for public access - DO NOT DO THIS IN PROD
+  cidr_blocks = ["${var.public ? var.public_cidr : var.vpc_cidr}"] # If there's a public IP, open Consul ports for public access.
 }
 
 resource "aws_security_group_rule" "ssh" {
@@ -62,7 +63,7 @@ resource "aws_security_group_rule" "ssh" {
   protocol          = "tcp"
   from_port         = 22
   to_port           = 22
-  cidr_blocks       = ["${var.public ? var.public_cidr : var.vpc_cidr}"] # If there's a public IP, open port 22 for public access - DO NOT DO THIS IN PROD
+  cidr_blocks       = ["${var.public ? var.public_cidr : var.vpc_cidr}"] # If there's a public IP, open port 22 for public access.
 }
 
 resource "aws_launch_configuration" "vault" {

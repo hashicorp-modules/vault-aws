@@ -84,7 +84,7 @@ ${!var.use_lb_cert ?
 "If you're making HTTP API requests to Vault from the Bastion host,
 the below env var has been set for you.
 
-  $ export VAULT_ADDR=http://vault.service.vault:8200
+  $ export VAULT_ADDR=http://vault.service.vault:${var.vault_port}
 
   $ curl \\
       -H \"X-Vault-Token: $${VAULT_TOKEN}\" \\
@@ -98,7 +98,7 @@ the below env var has been set for you.
 "If you're making HTTPS API requests to Vault from the Bastion host,
 the below env vars have been set for you.
 
-  $ export VAULT_ADDR=https://vault.service.vault:8200
+  $ export VAULT_ADDR=https://vault.service.vault:${var.vault_port}
   $ export VAULT_CACERT=/opt/vault/tls/vault-ca.crt
   $ export VAULT_CLIENT_CERT=/opt/vault/tls/vault.crt
   $ export VAULT_CLIENT_KEY=/opt/vault/tls/vault.key

@@ -52,13 +52,18 @@ variable "subnet_ids" {
 }
 
 variable "public" {
-  description = "Open up nodes to the public internet for easy access - DO NOT DO THIS IN PROD, defaults to false."
+  description = "Open up nodes to the public internet for easy access.  If true, set a restrictive public_cidr."
   default     = false
 }
 
 variable "public_cidr" {
   description = "CIDR to use for security group for public instances."
   default     = "0.0.0.0/0"
+}
+
+variable "vault_port" {
+  description = "Port on which to run the Vault server."
+  default     = "8200"
 }
 
 variable "count" {
